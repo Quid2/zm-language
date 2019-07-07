@@ -9,7 +9,7 @@ module Data.These
   ) where
 
 import           Data.Maybe
-import           Data.Semigroup (Semigroup)
+import           Data.Semigroup (Semigroup (..))
 
 -- |A data type that represents the presence of either a value, or another value or both
 data These a b
