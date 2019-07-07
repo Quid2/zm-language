@@ -1,6 +1,8 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE ScopedTypeVariables, NoMonomorphismRestriction#-}
+{-# LANGUAGE FlexibleContexts          #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE NoMonomorphismRestriction #-}
+{-# LANGUAGE RankNTypes                #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
 
 {- Parse ZM ADT declarations and values -}
 module ZM.Parser.ADT
@@ -9,16 +11,13 @@ module ZM.Parser.ADT
   , parType
   , absReference
   , absTypeId
-  )
-where
+  ) where
 
 import           Data.Maybe
 import           Text.Megaparsec
-import           ZM                      hiding ( Value
-                                                , absRef
-                                                )
-import           ZM.Parser.Types
+import           ZM              hiding (Value, absRef)
 import           ZM.Parser.Lexer
+import           ZM.Parser.Types
 import           ZM.Parser.Util
 
 {-|Parse a, possibly empty, group of ZM ADT declarations.
@@ -50,7 +49,7 @@ Just 是不是@(0:0-2) = 是@(0:8) | 不是@(1:22-23)
 >>> putStr $ prettyShow $ parseMaybe adt "A = A (A (B C D))"
 Just A@(0:0) = A@(0:4) (A@(0:7) (B@(0:10) C@(0:12) D@(0:14)))
 
->>> putStr $ prettyShow $ parseMaybe adt "Msg = Msg {from:Name.K306f1981b41c,subject:String}" 
+>>> putStr $ prettyShow $ parseMaybe adt "Msg = Msg {from:Name.K306f1981b41c,subject:String}"
 Just Msg@(0:0-2) = Msg@(0:6-8) {from@(0:11-14) :: Name.K306f1981b41c@(0:16-33),
                                 subject@(0:35-41) :: String@(0:43-48)}
 
@@ -58,7 +57,7 @@ Just Msg@(0:0-2) = Msg@(0:6-8) {from@(0:11-14) :: Name.K306f1981b41c@(0:16-33),
 Just List@(0:0-3) a@(0:5) = Cons@(0:9-12) {head@(0:15-18) :: a@(0:20),
                                            tail@(0:23-26) :: List@(0:28-31) a@(0:33)} | Nil@(1:0-2)
 
-                                           
+
 Syntax Errors:
 
 >>> putStr $ prettyShow $ parseDoc adt "Bool = | True"
@@ -72,10 +71,11 @@ Left "unexpected '.' expecting '=', '_', '\8801', alphanumeric character, end of
 -}
 adt :: Parser ADTParts
 adt =
-  (\name vars mcons -> ADTParts name vars (fromMaybe [] mcons))
-    <$> at namedAbsTypeId -- absIdAt
-    <*> many idAt
-    <*> optional ((symbol "=" <|> symbol "≡") *> sepBy constr (symbol "|"))
+  (\name vars mcons -> ADTParts name vars (fromMaybe [] mcons)) <$>
+  at namedAbsTypeId -- absIdAt
+   <*>
+  many idAt <*>
+  optional ((symbol "=" <|> symbol "≡") *> sepBy constr (symbol "|"))
 
 {-| Parse a constructor declaration (with either named or unnamed fields).
 
@@ -97,16 +97,15 @@ Just "V@(0:0) A@(0:2) B@(0:4) (C@(0:7) D@(0:9))"
 constr :: Parser (AtId, Fields AtId AtAbsName)
 constr = (,) <$> idAt <*> flds
       --flds = eitherP unnamedFlds namedFlds
-
- where
-  flds           = (Right <$> namedFlds) <|> (Left <$> unnamedFlds)
-  namedFlds      = cpars (sepBy namedConstrFld (symbol ","))
-  namedConstrFld = (,) <$> (idAt <* (symbol "::" <|> symbol ":")) <*> parType absIdAt
-  unnamedFlds    = many (simpleType absIdAt) -- many typeAt
+  where
+    flds = (Right <$> namedFlds) <|> (Left <$> unnamedFlds)
+    namedFlds = cpars (sepBy namedConstrFld (symbol ","))
+    namedConstrFld =
+      (,) <$> (idAt <* (symbol "::" <|> symbol ":")) <*> parType absIdAt
+    unnamedFlds = many (simpleType absIdAt) -- many typeAt
 
 -- atyp = pos (typ name)
 -- typeAt = typ absIdAt
-
 absIdAt :: Parser (Label Range (TypeName Identifier))
 absIdAt = at absTypeId
 
@@ -126,20 +125,18 @@ We assume that:
 at :: (MonadParsec e s m, Pretty a2) => m a2 -> m (Label Range a2)
 at parser = do
   pos <- getPosition
-  r   <- parser
+  r <- parser
   return $ mkAt pos (length (prettyShow r)) r
 
 -- at parser = do
 --   pos1 <- getPosition
 --   r <- parser
 --   (mr,ms) <- match parser
---   let l = length . dropWhile (== ' ') . reverse $ ms 
+--   let l = length . dropWhile (== ' ') . reverse $ ms
 --   --pos2 <- getPosition
 --   -- when (sourceLine pos2 /= sourceLine pos1) $ fail "at: unexpected multiline parser"
 --   --return $ At (mkRange pos1 (unPos (sourceColumn pos2) - unPos (sourceColumn pos1))) r
 --   return $ At (mkRange pos1 l) rr
-
-
 {-| Parse a type application, a type constructor with zero or more parameters
 
 >>> parseMaybe (parType localId) "a"
@@ -183,9 +180,8 @@ Just [TypeCon "a",TypeCon "b",TypeApp (TypeCon "c") (TypeCon "d"),TypeCon "e"]
 types :: Parser ref -> Parser [Type ref]
 types cons = some (simpleType cons)
 
-typN :: Parser a -> Parser (TypeN a)
-typN cons = pars (typN cons) <|> (TypeN <$> cons <*> many (typN cons))
-
+-- typN :: Parser a -> Parser (TypeN a)
+-- typN cons = pars (typN cons) <|> (TypeN <$> cons <*> many (typN cons))
 {-| Parse a simple type name, possibly qualified with an absolute code.
 
 >>> prettyShow <$> parseMaybe absTypeId "nil"
@@ -199,12 +195,8 @@ Just ".K306f1981b41c"
 -}
 absTypeId :: Parser (TypeName Identifier)
 absTypeId =
-  asTypeName Nothing
-    .   Just
-    <$> dref
-    <|> asTypeName
-    <$> (Just <$> localIdentifier)
-    <*> optional dref
+  asTypeName Nothing . Just <$> dref <|>
+  asTypeName <$> (Just <$> localIdentifier) <*> optional dref
 
 namedAbsTypeId :: Parser (TypeName Identifier)
 namedAbsTypeId = asTypeName <$> (Just <$> localIdentifier) <*> optional dref
@@ -214,4 +206,3 @@ dref = symbol "." *> absReference
 
 absReference :: Parser AbsRef
 absReference = AbsRef <$> shake
-

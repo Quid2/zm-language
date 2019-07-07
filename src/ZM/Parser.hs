@@ -32,10 +32,8 @@ import           Data.Word
 import           ZM.Abs
 import           ZM.Types
 
-tst = putStr . prettyShow . parseADTs
-
-ok = putStr . prettyShow . (\(Right a) -> a) . parseADTs
-
+-- tst = putStr . prettyShow . parseADTs
+-- ok = putStr . prettyShow . (\(Right a) -> a) . parseADTs
 -- import           ZM.Util
 {-|
 Parse a (possibly empty) closed group of ADT declarations.
