@@ -8,7 +8,7 @@
 module ZM.To.TypeScript
   ( generate
   , generateModule
-  , library
+  -- , library
   , defaultPrimitiveTypes
   )
 where
@@ -559,10 +559,11 @@ prepost0 pre post n =
 
 indent n = T.append (T.replicate n " ")
 
-library :: M.Map FilePath T.Text
-library =
-  asTextLibrary
-    $ $(embedFiles "quid2-ts" (anyMatching ["core/[^.]+\\.ts","core\\.ts","api\\.ts"]))
+-- Is this still required?
+-- library :: M.Map FilePath T.Text
+-- library =
+--   asTextLibrary
+--     $ $(embedFiles "quid2-ts" (anyMatching ["core/[^.]+\\.ts","core\\.ts","api\\.ts"]))
 
 {-
 export abstract class Maybe_ <A extends Q.Flat> {
