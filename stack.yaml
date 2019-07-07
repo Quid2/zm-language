@@ -16,4 +16,6 @@ extra-deps:
 
 - megaparsec-6.5.0
 - Unique-0.4.7.6
-- tasty-quickcheck-0.10@sha256:9ddbacf1504bbbc4b99ab447d26651ad8454b69ceced3486e4623dccb89fb3d9
+- tasty-quickcheck-0.10
+
+allow-newer: true
