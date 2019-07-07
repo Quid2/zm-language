@@ -1,0 +1,19 @@
+#resolver: lts-6.35
+resolver: lts-12.26
+#resolver: lts-13.25
+
+packages:
+- '.'
+#- ../zm
+
+extra-deps:
+- model-0.5
+- flat-0.3.4
+
+#- zm-0.3.2
+- github: Quid2/zm
+  commit: 70e5098e60da459e7c357c02937ffda7166c3b3f
+
+- megaparsec-6.5.0
+- Unique-0.4.7.6
+- tasty-quickcheck-0.10@sha256:9ddbacf1504bbbc4b99ab447d26651ad8454b69ceced3486e4623dccb89fb3d9
