@@ -29,7 +29,7 @@ library
         Data.These,ZM.Parser,ZM.Parser.Value,ZM.Parser.Lexer,ZM.Parser.ADT,ZM.Parser.Types,ZM.Parser.Util,ZM.To.Encoder,ZM.To.Haskell,ZM.To.TypeScript,ZM.To.ZMT,ZM.To.Util
     other-modules: FileEmbed
     build-depends:
-                  base >=4.9 && <=5
+                  base >=4.8.2.0 && <5
                 , array >=0.5.1.0 && <0.6
                 , bytestring
                 , containers

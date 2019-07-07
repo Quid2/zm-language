@@ -16,6 +16,6 @@ extra-deps:
 
 - megaparsec-6.5.0
 - Unique-0.4.7.6
-- tasty-quickcheck-0.10
+- tasty-quickcheck-0.10.1
 
 allow-newer: true
