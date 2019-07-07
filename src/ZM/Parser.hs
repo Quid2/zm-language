@@ -6,6 +6,7 @@
 -- Parse ZM data type definitions
 module ZM.Parser
   ( parseADTs
+  , module ZM.Parser.Types
   ) where
 
 import           ZM.Parser.ADT
