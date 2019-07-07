@@ -6,17 +6,19 @@ module ToZMTTest
   ) where
 
 import qualified Data.Text        as T
-import           Info             (models)
-import           Test.Data.Model
-import qualified Test.Data2       as Data2
-import qualified Test.Data3       as Data3
+
+-- import           Info             (models)
+-- import           Test.Data.Model
+-- import qualified Test.Data2       as Data2
+-- import qualified Test.Data3       as Data3
 import           Test.Tasty
 import           Test.Tasty.HUnit
 import           ZM
-import           ZM.Parser
-import           ZM.To.ZMT
-import           ZM.Types
 
+-- import           ZM.Parser
+import           ZM.To.ZMT
+
+-- import           ZM.Types
 t = defaultMain tests
 
 tests =

@@ -11,7 +11,7 @@ import           Test.Tasty
 import           Test.Tasty.HUnit
 import           ZM
 import           ZM.Parser
-import           ZM.Types
+-- import           ZM.Types
 
 t = defaultMain tests
 

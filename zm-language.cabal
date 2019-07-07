@@ -71,12 +71,12 @@ test-suite lib
         ParserTest
         Info
         Test.Data
-        Test.Data.Flat
+        -- Test.Data.Flat
         Test.Data.Model
         Test.Data2
-        Test.Data2.Flat
+        -- Test.Data2.Flat
         Test.Data3
-        Test.Data3.Flat
+        -- Test.Data3.Flat
         ToZMTTest
         ToHaskellTest
         ToTypeScriptTest
