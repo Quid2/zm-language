@@ -1,90 +1,136 @@
-name: zm-language
-version: 0.1
-synopsis: Parser, pretty printer and code generators for the ZM data modelling language
+name:               zm-language
+version:            0.3
+synopsis:
+  Parser, pretty printer and code generators for the ZM data modelling language
+
 description:
-    See the <http://github.com/Quid2/zm-language online tutorial>.
-homepage: http://github.com/Quid2/zm-language
-category: Data
-license:             BSD3
-license-file:        LICENSE
-author:              Pasqualino `Titto` Assini
-maintainer:          tittoassini@gmail.com
-copyright:           Copyright: (c) 2019 Pasqualino `Titto` Assini
-cabal-version: >=1.10
-build-type: Simple
-Tested-With: GHC == 7.10.3 GHC == 8.0.2 GHC == 8.2.2 GHC == 8.4.4 GHC == 8.6.5
+  See the <http://github.com/Quid2/zm-language online tutorial>.
+
+homepage:           http://github.com/Quid2/zm-language
+category:           Data
+license:            BSD3
+license-file:       LICENSE
+author:             Pasqualino `Titto` Assini
+maintainer:         tittoassini@gmail.com
+copyright:          Copyright: (c) 2019 Pasqualino `Titto` Assini
+cabal-version:      >=1.10
+build-type:         Simple
+tested-with:
+  GHC ==7.10.3 || ==8.0.2 || ==8.2.2 || ==8.4.4 || ==8.6.5
+
 extra-source-files:
-    stack.yaml
-    -- stack710.yaml
-    --stack802.yaml
-    --stack822.yaml
-    README.md
+  stack.yaml
+  README.md
 
+-- stack710.yaml
+--stack802.yaml
+--stack822.yaml
 source-repository head
-    type: git
-    location: https://github.com/Quid2/zm-language
-    
-library 
-    exposed-modules:
-        Data.These,ZM.Parser,ZM.Parser.Value,ZM.Parser.Lexer,ZM.Parser.ADT,ZM.Parser.Types,ZM.Parser.Util,ZM.To.Encoder,ZM.To.Haskell,ZM.To.TypeScript,ZM.To.ZMT,ZM.To.Util
-    other-modules: FileEmbed
-    build-depends:
-                  base >=4.8.2.0 && <5
-                , array >=0.5.1.0 && <0.6
-                , bytestring
-                , containers
-                , either
-                , model
-                , flat 
-                , zm >= 0.3
-                , megaparsec == 6.5.0
-                , parser-combinators
-                , scientific,text,filepath,directory,data-default,Unique,file-embed,template-haskell,regex-compat,pretty,extra
+  type:     git
+  location: https://github.com/Quid2/zm-language
 
-    default-language: Haskell2010
-    hs-source-dirs: src
-    -- ghc-options: -O2 -funbox-strict-fields -Wall -fno-warn-orphans -fno-warn-name-shadowing
-    ghc-options: -funbox-strict-fields -Wall -fno-warn-orphans -fno-warn-name-shadowing -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints 
-    -- -Werror
+flag fast
+  description: Enable assembler version of pattern matcher
+  default:     False
+
+library
+  exposed-modules:
+    -- Data.These
+    -- ZM.Parser
+    -- ZM.Parser.ADT
+    -- ZM.Parser.Env
+    -- ZM.Parser.Lexer
+    -- ZM.Parser.Types
+    -- ZM.Parser.Util
+    -- ZM.Parser.Value
+    -- ZM.To.Decoder
+    -- ZM.To.Encoder
+    ZM.To.Haskell
+    ZM.To.PureScript
+    ZM.To.TypeScript
+    ZM.To.Util
+    ZM.To.ZMT
+
+  other-modules:    FileEmbed
+  build-depends:
+      array               >=0.5.1.0 && <0.6
+    , base                >=4.8.2.0 && <5
+    , bytestring
+    , containers
+    , data-default
+    , data-fix
+    , directory
+    , either
+    , extra
+    , file-embed
+    , filepath
+    , flat
+    , megaparsec      
+    , model
+    , parser-combinators
+    , pretty
+    , regex-compat
+    , scientific
+    , template-haskell
+    , text
+    , Unique
+    , zm                  >=0.3
+
+  default-language: Haskell2010
+  hs-source-dirs:   src
+
+  -- ghc-options: -O2 -funbox-strict-fields -Wall -fno-warn-orphans -fno-warn-name-shadowing
+  ghc-options:
+    -funbox-strict-fields -Wall -fno-warn-orphans
+    -fno-warn-name-shadowing -Wincomplete-record-updates
+    -Wincomplete-uni-patterns -Wredundant-constraints
+
+-- -Werror
 
 test-suite lib
-    type: exitcode-stdio-1.0
-    main-is: Spec.hs
-    build-depends:
-                  base,
-                  containers,
-                  bytestring,
-                  text,
-                  pretty,
-                  tasty >= 0.11,
-                  tasty-hunit >= 0.8,
-                  tasty-quickcheck,
-                  timeit >=1,
-                  file-embed,filepath,
-                  flat,
-                  model,
-                  zm,
-                  zm-language
-    default-language: Haskell2010
-    hs-source-dirs: test
-    other-modules:
-        ParserTest
-        Info
-        Test.Data
-        -- Test.Data.Flat
-        Test.Data.Model
-        Test.Data2
-        -- Test.Data2.Flat
-        Test.Data3
-        -- Test.Data3.Flat
-        ToZMTTest
-        ToHaskellTest
-        ToTypeScriptTest
+  type:             exitcode-stdio-1.0
+  main-is:          Spec.hs
+  build-depends:
+      base
+    , bytestring
+    , containers
+    , file-embed
+    , filepath
+    , flat
+    , model
+    , pretty
+    , tasty             >=0.11
+    , tasty-hunit       >=0.8
+    , tasty-quickcheck
+    , text
+    , timeit            >=1
+    , zm
+    , zm-language
 
+  default-language: Haskell2010
+  hs-source-dirs:   test
+  other-modules:
+    Info
+    ParserTest
+    Test.Data
+    Test.Data.Model
+    Test.Data2
+    Test.Data3
+    ToHaskellTest
+    ToTypeScriptTest
+    ToZMTTest
+
+-- Test.Data.Flat
+-- Test.Data2.Flat
+-- Test.Data3.Flat
 test-suite doc
-  default-language:   Haskell2010
-  type:               exitcode-stdio-1.0
-  ghc-options:        -threaded -O0
-  main-is:            DocSpec.hs
-  build-depends:      base, doctest>=0.11.4,filemanip>=0.3.6.3
-  HS-Source-Dirs:     test
+  default-language: Haskell2010
+  type:             exitcode-stdio-1.0
+  ghc-options:      -threaded -O0
+  main-is:          DocSpec.hs
+  build-depends:
+      base
+    , doctest    >=0.11.4
+    , filemanip  >=0.3.6.3
+
+  hs-source-dirs:   test

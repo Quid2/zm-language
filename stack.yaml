@@ -1,21 +1,18 @@
-#resolver: lts-6.35
-resolver: lts-12.26
-#resolver: lts-13.25
+resolver: lts-14.27
 
 packages:
-- '.'
-#- ../zm
+  - "."
 
 extra-deps:
-- model-0.5
-- flat-0.3.4
+  - model-0.5
+  - flat-0.4.4
 
-#- zm-0.3.2
-- github: Quid2/zm
-  commit: 70e5098e60da459e7c357c02937ffda7166c3b3f
+  #- ../zm
+  - github: Quid2/zm
+    commit: c3e479e93233c87c86c64e383e5e302bc9207e11
+  #- zm-0.3.2
 
-- megaparsec-6.5.0
-- Unique-0.4.7.6
-- tasty-quickcheck-0.10.1
+  - megaparsec-7.0.5
 
-allow-newer: true
+  - Unique-0.4.7.6
+  - tasty-quickcheck-0.10.1
