@@ -3,6 +3,8 @@ resolver: lts-14.27
 packages:
   - "."
 
+allow-newer: true
+
 extra-deps:
   - model-0.5
   - flat-0.4.4
