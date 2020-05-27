@@ -1,0 +1,44 @@
+-- A declaration list is a set of local ADT definitions (so defined only by a simple name, with no K?) that might refer to absolute types that might or might not be defined in the spec.
+
+-- Joke = Joke (Kb8cd13187198.List K066db52af145.Char) Gigio For.Maggio;
+
+String = String (  
+  Kb8cd13187198.List -- An absolute reference with an optional name
+  K066db52af145.Char     -- An absolute reference (to Char)
+  -- K066db52af145     -- An absolute reference (to Char)
+);
+
+-- Float = Kb53bec846608.;
+
+-- Kb8cd13187198.List a = Nil | Cons a (List a);
+
+-- List a = Nil | Cons a (List a);
+
+-- A = B B;B = B A;
+
+Answer = Answer
+  Bool -- Refers to the last Bool defined
+;
+
+-- This definition is ignored as is overriden by the next one
+Bool = False | True;
+
+-- This definition is ignored as is overriden by the next one
+Bool = F | T;
+
+-- This will override the previous Bool definition
+Bool = T | F;
+
+-- To differentiate among multiple definitions with the same name
+-- We put them in different namespaces
+-- Either with an absolute id or a local
+-- Kb8cd13187198.List a = Nil | Cons a (List a);
+
+-- BAD zm code
+Kb8cd13187199.List a = Nil | Cons a (List a);
+
+-- A different kind of List
+List a = Elem a | Cons a (List a);
+
+-- Another kind of List
+A.List a = None | Cons a (A.List a);

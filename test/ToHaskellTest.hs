@@ -2,16 +2,18 @@
 
 module ToHaskellTest
   ( tests
-  ) where
+  , updateReferenceFiles
+  )
+where
 
 import           Control.Arrow
 import           Data.Bifunctor
 import           Data.FileEmbed
 import           Data.Int
-import qualified Data.Map             as M
-import qualified Data.Text            as T
+import qualified Data.Map                      as M
+import qualified Data.Text                     as T
 import           Data.Word
-import           Info                 (models)
+import           Info                           ( models )
 import           System.FilePath
 import           Test.Tasty
 import           Test.Tasty.HUnit
@@ -30,43 +32,48 @@ import           ZM.Type.NonEmptyList
 import           ZM.Type.Tuples
 import           ZM.Type.Unit
 import           ZM.Types
+import qualified Data.ByteString               as B
 
--- import Test.ZM.ADT.All -- Compile all generated files
-updateFiles =
-  mapM_
-    (mdlWrite
-       WriteFlags
-         {srcDir = "/Users/titto/workspace/zm-language/test", overwrite = True})
-    genFiles
+-- import           Test.ZM.ADT.All -- Compile all generated files
+
+-- write new reference files (not embedded though till this file is recompiled)
+updateReferenceFiles = mapM_
+  (mdlWrite WriteFlags { srcDir    = "/Users/titto/workspace/zm-language/test"
+                       , overwrite = True
+                       }
+  )
+  genFiles
 
 t = defaultMain tests
 
-tests = testGroup "ToHaskell" $ map tst gFiles
-  where
-    tst (k, cnt) =
-      let Just rcnt = M.lookup k refs
-       in testCase (unwords ["To Haskell", k]) (cnt @?= rcnt)
-    refs = M.fromList rFiles
+tests = testGroup "ToHaskell" $ map tst latestFiles
+ where
+  tst (k, latestFiles) =
+    let Just reference = M.lookup k refs
+    in  testCase (unwords ["To Haskell", k]) (latestFiles @?= reference)
+  refs = M.fromList referenceFiles
 
-gFiles, rFiles :: [(FilePath, T.Text)]
-gFiles = map (mdlFilePath &&& mdlContent) genFiles
 
-rFiles = map ((genDir </>) *** convert) refFiles
+latestFiles, referenceFiles :: [(FilePath, T.Text)]
+latestFiles = map (mdlFilePath &&& mdlContent) genFiles
 
-genDir = "Test/ZM"
+referenceFiles = map ((genDir </>) *** convert) refFiles
+  where genDir = "Test/ZM"
 
 -- [("ADT/All.hs","module Test.ZM.ADT.All..."),..]
+refFiles :: [(FilePath, B.ByteString)]
 refFiles = $(embedDir "test/Test/ZM")
 
+
 -- [Module {mdlPath = ["Test","ZM","ADT","All"]..]
-genFiles =
-  generate
-    Flags
-      { namespace = ["Test", "ZM", "ADT"]
-      , primTypes = defaultPrimitiveTypes
-      , addIndex = False
-      }
-    (absEnv (Proxy :: Proxy AbsADT)) -- g = mapM_ (mdlWrite WriteFlags {srcDir="/Users/titto/workspace/zm-language/test",overwrite=False}) $ generate Flags {namespace=["Test","ZM","ADT"],primTypes=[],addIndex=True} (absEnv (Proxy :: Proxy AbsADT))
+genFiles = generate
+  Flags { namespace = ["Test", "ZM", "ADT"]
+        , primTypes = defaultPrimitiveTypes
+        , addIndex  = False
+        }
+  (absEnv (Proxy :: Proxy AbsADT))
+
+-- g = mapM_ (mdlWrite WriteFlags {srcDir="/Users/titto/workspace/zm-language/test",overwrite=False}) $ generate Flags {namespace=["Test","ZM","ADT"],primTypes=[],addIndex=True} (absEnv (Proxy :: Proxy AbsADT))
 -- t = sh (Proxy :: Proxy Bits11)
 -- sh p = let env = typeEnv . absTypeModel $ p
 --            ref = last . M.keys $ env

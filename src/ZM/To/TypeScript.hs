@@ -15,18 +15,18 @@ where
 
 import           Data.Bifunctor
 import           Data.Bool
-import           Data.Char                      ( chr
-                                                , ord
-                                                , toLower
-                                                )
+-- import           Data.Char                      ( chr
+--                                                 , ord
+--                                                 , toLower
+--                                                 )
 import qualified Data.Map                      as M
 import qualified Data.Text                     as T
 import           ZM -- hiding (dotted, moduleName)
 import           ZM.To.Util
-import           Data.String
-import           FileEmbed
-import qualified Data.Set                      as Set
-import           Data.Word
+-- import           FileEmbed
+-- import qualified Data.Set                      as Set
+-- import           Data.Word
+
 
 {- |
 TODO: 
@@ -42,6 +42,7 @@ are rewritten as:
 A = _A ...
 
 $setup
+>>> import Data.Word
 >>> p0 = Proxy :: Proxy [Bool]
 >>> p1 = Proxy :: Proxy AbsADT
 >>> p2 = Proxy :: Proxy (BLOB Bool) -- (ByType Bit)
@@ -215,9 +216,6 @@ generateModule flags adtEnv (adtRef, adt) =
         nf
       , "  ) { }"
       ]
-    namedFields = either
-      (zip [ T.pack ("_" ++ show n) | n <- [0 :: Int ..] ])
-      (map (first asT))
     toString cname nf =
       let
         ns = map fst nf
@@ -516,17 +514,13 @@ tsRef _   self Rec     = self
 typeVars :: ADT name consName ref -> [T.Text]
 typeVars adt = map (var . (\v -> v - 1)) [1 .. declNumParameters adt]
 
-var :: Integral a => a -> T.Text
-var = T.singleton . chr . (ord 'A' +) . fromIntegral
-
-prettyT :: Pretty a => a -> T.Text
-prettyT = T.pack . prettyShow
-
 typeVarsSeq :: T.Text -> ADT name consName ref -> T.Text
 typeVarsSeq post = list "" (sig . map (`T.append` post)) . typeVars
 
 --typeSigM f = list "" (sig . map f) . zip [0..] . typeVars
 
+-- typeVarsM :: (Num a, Enum a) =>
+--                ADT name consName ref -> ([b] -> String) -> ((a, T.Text) -> b) -> T.Text
 typeVarsM adt lst f = list "" (lst . map f) . zip [0 ..] $ typeVars adt
 
 funcDef1 name vs body = funcDef name vs $ T.unwords ["return", body]
@@ -535,28 +529,25 @@ funcDef name vs body = T.concat ["function ", name, pars vs, " {", body, "}"]
 
 funcCall name vs = T.concat [name, pars vs]
 
-sig vs = T.concat ["<", commaed vs, ">"]
 
-obj vs = T.concat ["{", commaed vs, "}"]
 
-arr vs = T.concat ["[", commaed vs, "]"]
 
-pars vs = T.concat ["(", commaed vs, ")"]
-
-par v = T.concat ["(", v, ")"]
-
-commaed = T.intercalate ","
-
+prefix :: (Show a, Num a, Enum a) => Char -> a -> [T.Text]
 prefix pre = prepost pre ""
 
 --inx f vs = map (\v -> f T.concat[pre `T.cons` T.pack (show n),post]) vs
 
+prepost :: (Show a, Num a, Enum a) =>
+             Char -> T.Text -> a -> [T.Text]
 prepost pre post n =
   map (\n -> T.concat [pre `T.cons` T.pack (show n), post]) [1 .. n]
 
+prepost0 :: (Show a, Num a, Enum a) =>
+              T.Text -> T.Text -> a -> [T.Text]
 prepost0 pre post n =
   map (\n -> T.concat [pre `T.append` T.pack (show n), post]) [0 .. n - 1]
 
+indent :: Int -> T.Text -> T.Text
 indent n = T.append (T.replicate n " ")
 
 -- Is this still required?

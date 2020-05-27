@@ -16,7 +16,9 @@ import qualified ToZMTTest
 
 t = main
 
-main = defaultMain tests
+main = do
+  ToHaskellTest.updateReferenceFiles
+  defaultMain tests
 
 tests :: TestTree
 tests =

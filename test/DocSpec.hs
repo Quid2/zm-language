@@ -9,10 +9,11 @@ main = do
   fs <- find
     always
     (   (extension ==? ".hs")
-    &&? exceptFiles ["Test.hs", "Data/Timeless.hs"]
+    &&? exceptFiles ["Test.hs", "Data/Timeless.hs", "ZM/Pretty/Value.hs"]
     )
     "src"
-  doctest $ ["-package megaparsec-6.5.0","-package QuickCheck","--fast"] ++ fs
+  -- doctest $ ["-package megaparsec-6.5.0","-package QuickCheck","--fast"] ++ fs
+  doctest $ ["-package QuickCheck", "--fast"] ++ fs
 
 exceptFiles :: Foldable t => t String -> FindClause Bool
 exceptFiles mdls =

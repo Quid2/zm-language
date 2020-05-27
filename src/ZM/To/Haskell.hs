@@ -1,7 +1,7 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleContexts          #-}
+{-# LANGUAGE MultiParamTypeClasses     #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings         #-}
 
 module ZM.To.Haskell
   ( WriteFlags(..)
@@ -16,18 +16,19 @@ where
 
 --import Control.Monad
 import qualified Data.Map                      as M
+
 --import qualified Data.Set as Set
 import qualified Data.Text                     as T
+
 --import qualified Data.Text.IO as T
 import           ZM                      hiding ( dotted
                                                 , mdlName
                                                 , moduleName
-                                                ) -- ?
+                                                )
 import           ZM.To.Util
+
 --import Data.String
-
 -- t = mapM_ (mdlWrite WriteFlags {srcDir="/Users/titto/workspace/zm-language/test",overwrite=False}) $ generate Flags {namespace=["Test","ZM","ADT"],primTypes=[],addIndex=True} (absEnv (Proxy :: Proxy [Bool]))
-
 type HFlags = Flags T.Text
 
 defaultPrimitiveTypes :: M.Map T.Text T.Text
@@ -56,13 +57,13 @@ generateModule :: HFlags -> AbsEnv -> (AbsRef, AbsADT) -> Module
 generateModule flags adtEnv (adtRef, adt) =
   let
     ns          = namespaceT flags
-    -- e.g. Bit
+  -- e.g. Bit
     name        = declNameT adt
-    -- e.g. Bit.K65149ce3b366
+  -- e.g. Bit.K65149ce3b366
     absName     = moduleShortName name adtRef
-    -- e.g. ZM.ADT.Bit.K65149ce3b366
+  -- e.g. ZM.ADT.Bit.K65149ce3b366
     mdlName     = moduleName ns name adtRef
-    -- e.g. ["ZM","ADT","Bit","K65149ce3b366"]
+  -- e.g. ["ZM","ADT","Bit","K65149ce3b366"]
     mdlNameC    = moduleName_ id ns name adtRef
     contentNorm = T.unlines
       [ "{-# LANGUAGE DeriveAnyClass #-}"
@@ -70,8 +71,9 @@ generateModule flags adtEnv (adtRef, adt) =
       , header
       , "import qualified Prelude(Eq,Ord,Show)"
       , "import qualified GHC.Generics"
-      , "import qualified Data.Flat"
+      , "import qualified Flat"
       , "import qualified Data.Model"
+      , "import qualified Control.DeepSeq"
       , T.unlines
       $ map
           (\ref -> T.unwords
@@ -82,7 +84,7 @@ generateModule flags adtEnv (adtRef, adt) =
       $ prettyShow
       $ prettyADT (if isNewType adt then "newtype " else "data ") '='
       $ substAbsADT (\ref -> adtFullName ns (declNameS adtEnv ref) ref) adt
-      , "  deriving (Prelude.Eq, Prelude.Ord, Prelude.Show, GHC.Generics.Generic, Data.Flat.Flat)"
+      , "  deriving (Prelude.Eq, Prelude.Ord, Prelude.Show, GHC.Generics.Generic, Flat.Flat, Control.DeepSeq.NFData)" -- NFData was missing
       , instanceADT "Data.Model.Model" adt
       ]
     contentPrim =
@@ -95,14 +97,10 @@ generateModule flags adtEnv (adtRef, adt) =
     hsModule mdlNameC content
 
 --declNameT = convert . adtNameS
-
 --adtNameS :: Convertible a String => ADT a consName ref -> String
 --adtNameS adt = convert (declName adt) :: String
-
 -- moduleRelFile = moduleName_ modulePath
-
 -- modulePath ps = joinPath (map convert ps) <.> "hs"
-
 -- ZM.Type.Bit.K65149ce3b366
 moduleName :: Pretty a2 => [T.Text] -> T.Text -> a2 -> T.Text
 moduleName = moduleName_ dotted
