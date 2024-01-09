@@ -18,10 +18,9 @@ build-type:         Simple
 tested-with:
   GHC ==7.10.3 || ==8.0.2 || ==8.2.2 || ==8.4.4 || ==8.6.5
 
-extra-source-files:
-  stack.yaml
-  README.md
+extra-source-files: README.md
 
+-- stack.yaml
 -- stack710.yaml
 --stack802.yaml
 --stack822.yaml
@@ -35,22 +34,22 @@ flag fast
 
 library
   exposed-modules:
-    -- Data.These
-    -- ZM.Parser
-    -- ZM.Parser.ADT
-    -- ZM.Parser.Env
-    -- ZM.Parser.Lexer
-    -- ZM.Parser.Types
-    -- ZM.Parser.Util
-    -- ZM.Parser.Value
-    -- ZM.To.Decoder
-    -- ZM.To.Encoder
     ZM.To.Haskell
     ZM.To.PureScript
     ZM.To.TypeScript
     ZM.To.Util
     ZM.To.ZMT
 
+  -- Data.These
+  -- ZM.Parser
+  -- ZM.Parser.ADT
+  -- ZM.Parser.Env
+  -- ZM.Parser.Lexer
+  -- ZM.Parser.Types
+  -- ZM.Parser.Util
+  -- ZM.Parser.Value
+  -- ZM.To.Decoder
+  -- ZM.To.Encoder
   other-modules:    FileEmbed
   build-depends:
       array               >=0.5.1.0 && <0.6
@@ -65,7 +64,7 @@ library
     , file-embed
     , filepath
     , flat
-    , megaparsec      
+    , megaparsec
     , model
     , parser-combinators
     , pretty
@@ -134,3 +133,23 @@ test-suite doc
     , filemanip  >=0.3.6.3
 
   hs-source-dirs:   test
+
+-- test-suite flat-test
+--   default-language: Haskell2010
+--   type:             exitcode-stdio-1.0
+--   main-is:          FlatTest.hs
+
+--   -- Modules included in this executable, other than Main.
+--   -- other-modules:
+
+--   -- LANGUAGE extensions used by modules in this package.
+--   -- other-extensions:
+--   build-depends:
+--       base
+--     , bytestring
+--     , flat
+--     , pretty-simple
+--     , QuickCheck     >=2.14.2
+--     , zm
+
+--   hs-source-dirs:   test
