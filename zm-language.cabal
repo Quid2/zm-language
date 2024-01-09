@@ -1,5 +1,5 @@
 name:               zm-language
-version:            0.3
+version:            0.3.1
 synopsis:
   Parser, pretty printer and code generators for the ZM data modelling language
 
