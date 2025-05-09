@@ -1,8 +1,10 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleContexts          #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE MultiParamTypeClasses     #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell, FlexibleInstances,ScopedTypeVariables #-}
+{-# LANGUAGE OverloadedStrings         #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
+{-# LANGUAGE TemplateHaskell           #-}
 
 {-| Convert ZM ADTs to TypeScript data definitions  -}
 module ZM.To.TypeScript
@@ -19,9 +21,9 @@ import           Data.Bool
 --                                                 , ord
 --                                                 , toLower
 --                                                 )
-import qualified Data.Map                      as M
-import qualified Data.Text                     as T
-import           ZM -- hiding (dotted, moduleName)
+import qualified Data.Map       as M
+import qualified Data.Text      as T
+import           ZM
 import           ZM.To.Util
 -- import           FileEmbed
 -- import qualified Data.Set                      as Set
@@ -29,13 +31,13 @@ import           ZM.To.Util
 
 
 {- |
-TODO: 
+TODO:
 - make objects into pure unmodifiable values. (no write access to fields)
 - generate also semi-custom classes (Word/Ints,List,String..)
   - Use js patching  to customise classes.
 
 NOTE:
-Constructors whose name clashes with the data type name: 
+Constructors whose name clashes with the data type name:
 A = A .. | ..
 
 are rewritten as:
@@ -107,7 +109,7 @@ generateIndex flags env = tsModule ["All"] $ imports
 
 -- Does not use all flags
 -- generateModule :: TFlags -> AbsEnv -> AbsRef -> Module
--- generateModuleO flags adtEnv adtRef = generateModule flags adtEnv (M.lookup )    
+-- generateModuleO flags adtEnv adtRef = generateModule flags adtEnv (M.lookup )
 
 -- |Generate the indicated module
 generateModule :: TFlags -> AbsEnv -> (AbsRef, AbsADT) -> Module
@@ -128,7 +130,7 @@ generateModule flags adtEnv (adtRef, adt) =
     mdlNameC     = moduleName_ id ns name adtRef
     -- |True if it has more than one contructor and one constructor has the same name as the adt
     hasNameClash = length constrNames > 1 && (name `elem` constrNames)
-    -- Prefix with '_' name clashing constructor 
+    -- Prefix with '_' name clashing constructor
     fullConstrName cname =
       let n = asT cname
       in  if hasNameClash && name == n then T.cons '_' n else n
@@ -150,7 +152,7 @@ generateModule flags adtEnv (adtRef, adt) =
           cs = constructors ct
       in  T.unlines
             [ classHeader (fullConstrName cname)
-           --, zmType (declNumParameters adt)   
+           --, zmType (declNumParameters adt)
             , constructor nf
             , toString cname nf
             , match cs cname nf
@@ -178,8 +180,8 @@ generateModule flags adtEnv (adtRef, adt) =
     classHeader name =
       T.unwords ["export class", name, adtTypeVars, "implements Q.ZM {"]
 
-    -- match <R>(m:{Nothing:R,Just:(v:A)=>R}) : R {return m.Nothing;} 
-    -- match <R>(m:{Nothing:R,Just:(v:A)=>R}) : R {return m.Just(this._0);} 
+    -- match <R>(m:{Nothing:R,Just:(v:A)=>R}) : R {return m.Nothing;}
+    -- match <R>(m:{Nothing:R,Just:(v:A)=>R}) : R {return m.Just(this._0);}
     match cs cname nf = T.concat
       [ "  match <R>(m:"
       , matchSig cs
@@ -264,15 +266,34 @@ generateModule flags adtEnv (adtRef, adt) =
             then "  flatEncode() {}"
             else T.concat ["  flatEncode(st:Q.EncoderState) {", flatEnc, "}"]
           ]
-    --importLib as name = T.concat ["import * as ",as," from '", T.concat $ replicate (length ns + 1) "./lib/",name,"'"]
-    importLib as name = T.concat
+
+    -- always import from quid2-core
+    importLib as _ = T.concat
       [ "import * as "
       , as
-      , " from '"
-      , T.concat $ replicate (length ns + 1) "../"
-      , libFile name
-      , "'"
+      , " from '@quid2/core'"
       ]
+
+    -- always import locally
+    -- importLib as name = T.concat
+    --   [ "import * as "
+    --   , as
+    --   , " from '"
+    --   , T.concat $ replicate (length ns + 1) "../"
+    --   , libFile name
+    --   , "'"
+    --   ]
+    -- libFile = T.append "@quid2/core"
+
+    -- THis can be either a local reference (in quid2), e.g.: "'../.." or an external reference to the quid2 lib
+    -- importLib as name = T.concat
+    --   [ "import * as "
+    --   , as
+    --   , " from '"
+    --   , T.concat $ replicate (length ns + 1) "../"
+    --   , libFile name
+    --   , "'"
+    --   ]
     arity = declNumParameters adt
     -- export function zmType(f:zmFold) {return f([0x4b,0xbd,0x38,0x58,0x7b,0x9e],[]);}
     -- export function zmType(t1:any) {return function(f:zmFold) {f([0x22,0xbd,0x38,0x58,0x7b,0x9e],[t1(f)])}}
@@ -289,16 +310,16 @@ generateModule flags adtEnv (adtRef, adt) =
       dunflat
       dct
 
-    --lowerHead t = T.toLower T.head h : t        
+    --lowerHead t = T.toLower T.head h : t
 
     -- unflat :: T.Text
     -- unflat = maybe (T.unwords ["throw Error(\"",absName,"has no values and cannot be decoded\""]) directUnflat dct
 
-    -- directUnflat ct = T.unwords ["    return function(st) {",dunflat ct,"}"]              
+    -- directUnflat ct = T.unwords ["    return function(st) {",dunflat ct,"}"]
 
-    -- BUG: fails for recursive defs  
+    -- BUG: fails for recursive defs
     -- preUnflat ct = T.unlines [decs ct
-    --                           ,T.unwords ["    return function(st) {",unflat_ ct,"}"]] 
+    --                           ,T.unwords ["    return function(st) {",unflat_ ct,"}"]]
 
     -- const decs = {"BLOB":[decoders[0],(Kf8844385a443.$Bytes)(flatDecoder)]};
     decs ct = T.unwords
@@ -452,9 +473,10 @@ generateModule flags adtEnv (adtRef, adt) =
   in
     tsModule mdlNameC content
 
-libFile = T.append "./lib/"
+-- libFile = T.append "./lib/"
 
--- import * as K306f1981b41c from '<dir>Bool/K306f1981b41c'  
+
+-- import * as K306f1981b41c from '<dir>Bool/K306f1981b41c'
 imports
   :: (Convertible a String, Show a1, Ord a1, Pretty a1)
   => T.Text
@@ -470,7 +492,7 @@ imports dir adtEnv = T.unlines . map
     ]
   )
 
--- Return the corresponding Typescript type           
+-- Return the corresponding Typescript type
 tsType :: Pretty a => Type a -> T.Text
 tsType = pt . typeN
  where
@@ -493,7 +515,7 @@ decRef _ self Rec = \ds -> T.concat ["___.decoder", par . arr $ ds]
 
 {-
 A                  -- variable
-List<A>            -- self reference 
+List<A>            -- self reference
 K306f1981b41c.Bool -- external reference
 -}
 tsRef
@@ -560,10 +582,10 @@ indent n = T.append (T.replicate n " ")
 export abstract class Maybe_ <A extends Q.Flat> {
   static zid : [0xda,0x68,0x36,0x77,0x8f,0xd4];
 
-  static decoder : function (decoders:any[]) {  
-    return function(st:any) {    
+  static decoder : function (decoders:any[]) {
+    return function(st:any) {
             if (st.bit()) {return new Just(decoders[0](st));}
-            else return new Nothing(); 
+            else return new Nothing();
     }
   };
 }
