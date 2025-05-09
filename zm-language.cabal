@@ -108,7 +108,6 @@ test-suite lib
   hs-source-dirs:   test
   other-modules:
     Info
-    ParserTest
     Test.Data
     Test.Data.Model
     Test.Data2
