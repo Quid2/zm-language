@@ -11,6 +11,7 @@ module ZM.To.Dart
     generateModule,
     -- , library
     defaultPrimitiveTypes,
+    save,
   )
 where
 
@@ -26,6 +27,7 @@ import Data.Bool
 import qualified Data.Map as M
 import Data.Text (Text)
 import qualified Data.Text as T
+import System.Posix.Internals (get_saved_termios)
 import ZM
 import ZM.Parser (mdl)
 import ZM.To.Util
@@ -89,6 +91,13 @@ A primitive type
 -- --   genT
 
 -- p4 = Proxy :: Proxy RepoProtocol
+
+t = save $ absEnv (Proxy :: Proxy (Either Bool Bool))
+
+save :: AbsEnv -> IO ()
+save = mapM_ (mdlWrite WriteFlags {srcDir = "/Users/titto/workspace/flutter/notifications/lib", overwrite = True}) . gen
+
+gen = generate (Flags {namespace = ["zm", "adt"], primTypes = defaultPrimitiveTypes, addIndex = False})
 
 -- | ZM Types that are mapped to primitive JS types
 defaultPrimitiveTypes =
