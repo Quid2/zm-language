@@ -7,6 +7,8 @@ module ZM.To.Util where
 -- import qualified Data.Set                      as Set
 
 import Control.Monad
+import Control.Monad.Reader
+import Control.Monad.Writer
 import Data.Bifunctor
 import Data.Char
 import qualified Data.Map as M
@@ -15,7 +17,33 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath
+import Text.PrettyPrint (Doc, render, vcat)
 import ZM hiding (chr, dotted)
+
+-- | Monad stack for code generation: Reader for AbsEnv, Writer for code fragments
+type CodeGen = ReaderT AbsEnv (Writer [Doc])
+
+emit :: Doc -> CodeGen ()
+emit d = lift $ tell [d]
+
+getEnv :: CodeGen AbsEnv
+getEnv = ask
+
+runCodeGen :: AbsEnv -> CodeGen a -> Doc
+runCodeGen env cg = vcat $ execWriter (runReaderT cg env)
+
+{-
+>>> error $ t (absEnv (Proxy:: Proxy [Bool]))
+Bool.K306f1981b41c ≡   False
+                     | True;
+List.Kb8cd13187198 a ≡   Nil
+                       | Cons a (List.Kb8cd13187198 a);
+-}
+t env = render $ runCodeGen env cg
+  where
+    cg = do
+      adt <- ask
+      emit $ text $ prettyShow adt
 
 data WriteFlags
   = WriteFlags
@@ -44,6 +72,9 @@ data Module
 
 hsModule :: [T.Text] -> T.Text -> Module
 hsModule = Module "hs"
+
+dartModule :: [T.Text] -> T.Text -> Module
+dartModule = Module "dart"
 
 tsModule :: [T.Text] -> T.Text -> Module
 tsModule = Module "ts"
@@ -116,6 +147,8 @@ declNameS adtEnv adtRef = declNameT $ solve adtRef adtEnv
 declNameT :: (Convertible a String) => ADT a consName ref -> T.Text
 declNameT = asT . declName
 
+-- >>> var 1
+-- "B"
 var :: (Integral a) => a -> T.Text
 var = var_ 'A'
 
@@ -126,8 +159,10 @@ prettyT :: (Pretty a) => a -> T.Text
 prettyT = T.pack . prettyShow
 
 namedFields :: (Convertible a String) => Either [b] [(a, b)] -> [(T.Text, b)]
-namedFields =
-  either (zip [T.pack ("_" ++ show n) | n <- [0 :: Int ..]]) (map (first asT))
+namedFields = namedFieldsWith (\n -> "_" ++ show n)
+
+namedFieldsWith :: (Convertible a String) => (Int -> String) -> Either [b] [(a, b)] -> [(T.Text, b)]
+namedFieldsWith mkName = either (zip [T.pack (mkName n) | n <- [0 :: Int ..]]) (map (first asT))
 
 numFields :: Either [a1] [(a2, a1)] -> [T.Text]
 numFields fs = [T.pack ("_" ++ show n) | n <- [1 .. length (fieldsTypes fs)]]
@@ -138,20 +173,21 @@ asT = T.pack . convert
 showT :: (Show a) => a -> T.Text
 showT = asT . show
 
-dotted :: [T.Text] -> T.Text
+dotted, undered, commaed :: [T.Text] -> T.Text
 dotted = T.intercalate "."
+undered = T.intercalate "_"
+commaed = T.intercalate ","
 
 list :: p -> ([a] -> p) -> [a] -> p
 list nil _ [] = nil
 list _ f l = f l
 
-obj, arr, pars, pats, sig, commaed :: [T.Text] -> T.Text
+obj, arr, pars, pats, sig :: [T.Text] -> T.Text
 obj vs = T.concat ["{", commaed vs, "}"]
 arr vs = T.concat ["[", commaed vs, "]"]
 pars vs = T.concat ["(", commaed vs, ")"]
 pats vs = T.concat ["(", T.unwords vs, ")"]
 sig vs = T.concat ["<", commaed vs, ">"]
-commaed = T.intercalate ","
 
 par :: T.Text -> T.Text
 par v = T.concat ["(", v, ")"]

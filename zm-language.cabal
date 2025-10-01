@@ -1,22 +1,22 @@
-name:               zm-language
-version:            0.3.1
+name: zm-language
+version: 0.3.1
 synopsis:
   Parser, pretty printer and code generators for the ZM data modelling language
 
 description:
   See the <http://github.com/Quid2/zm-language online tutorial>.
 
-homepage:           http://github.com/Quid2/zm-language
-category:           Data
-license:            BSD3
-license-file:       LICENSE
-author:             Pasqualino `Titto` Assini
-maintainer:         tittoassini@gmail.com
-copyright:          Copyright: (c) 2019 Pasqualino `Titto` Assini
-cabal-version:      >=1.10
-build-type:         Simple
+homepage: http://github.com/Quid2/zm-language
+category: Data
+license: BSD3
+license-file: LICENSE
+author: Pasqualino `Titto` Assini
+maintainer: tittoassini@gmail.com
+copyright: Copyright: (c) 2025 Pasqualino `Titto` Assini
+cabal-version: >=1.10
+build-type: Simple
 tested-with:
-  GHC ==7.10.3 || ==8.0.2 || ==8.2.2 || ==8.4.4 || ==8.6.5
+  ghc ==7.10.3 || ==8.0.2 || ==8.2.2 || ==8.4.4 || ==8.6.5 || ==9.6.7
 
 extra-source-files: README.md
 
@@ -25,11 +25,12 @@ extra-source-files: README.md
 --stack802.yaml
 --stack822.yaml
 source-repository head
-  type:     git
+  type: git
   location: https://github.com/Quid2/zm-language
 
 library
   exposed-modules:
+    ZM.To.Dart
     ZM.To.Haskell
     ZM.To.PureScript
     ZM.To.TypeScript
@@ -46,66 +47,69 @@ library
   -- ZM.Parser.Value
   -- ZM.To.Decoder
   -- ZM.To.Encoder
-  other-modules:    FileEmbed
+  other-modules: FileEmbed
   build-depends:
-      array               >=0.5.1.0 && <0.6
-    , base                >=4.8.2.0 && <5
-    , bytestring
-    , containers
-    , data-default
-    , data-fix
-    , directory
-    , either
-    , extra
-    , file-embed
-    , filepath
-    , flat
-    , megaparsec
-    , model
-    , parser-combinators
-    , pretty
-    , QuickCheck
-    , regex-compat
-    , scientific
-    , template-haskell
-    , text
-    , Unique
-    , zm                  >=0.3
+    QuickCheck,
+    Unique,
+    array >=0.5.1.0 && <0.6,
+    base >=4.8.2.0 && <5,
+    bytestring,
+    containers,
+    data-default,
+    data-fix,
+    directory,
+    either,
+    extra,
+    file-embed,
+    filepath,
+    flat,
+    megaparsec,
+    model,
+    parser-combinators,
+    pretty,
+    mtl,
+    regex-compat,
+    scientific,
+    template-haskell,
+    text,
+    zm >=0.3
 
   -- TODO: remove QuickCheck
   default-language: Haskell2010
-  hs-source-dirs:   src
-
+  hs-source-dirs: src
   -- ghc-options: -O2 -funbox-strict-fields -Wall -fno-warn-orphans -fno-warn-name-shadowing
   ghc-options:
-    -funbox-strict-fields -Wall -fno-warn-orphans
-    -fno-warn-name-shadowing -Wincomplete-record-updates
-    -Wincomplete-uni-patterns -Wredundant-constraints
+    -funbox-strict-fields
+    -Wall
+    -fno-warn-orphans
+    -fno-warn-name-shadowing
+    -Wincomplete-record-updates
+    -Wincomplete-uni-patterns
+    -Wredundant-constraints
 
 -- -Werror
-
 test-suite lib
-  type:             exitcode-stdio-1.0
-  main-is:          Spec.hs
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
   build-depends:
-      base
-    , bytestring
-    , containers
-    , file-embed
-    , filepath
-    , flat
-    , model
-    , pretty
-    , tasty             >=0.11
-    , tasty-hunit       >=0.8
-    , tasty-quickcheck
-    , text
-    , timeit            >=1
-    , zm
-    , zm-language
+    base,
+    bytestring,
+    containers,
+    file-embed,
+    filepath,
+    flat,
+    model,
+    pretty,
+    tasty >=0.11,
+    tasty-hunit >=0.8,
+    tasty-quickcheck,
+    text,
+    timeit >=1,
+    zm,
+    zm-language
 
   default-language: Haskell2010
-  hs-source-dirs:   test
+  hs-source-dirs: test
   other-modules:
     Info
     Test.Data
@@ -121,24 +125,25 @@ test-suite lib
 -- Test.Data3.Flat
 test-suite doc
   default-language: Haskell2010
-  type:             exitcode-stdio-1.0
-  ghc-options:      -threaded -O0
-  main-is:          DocSpec.hs
-  build-depends:
-      base
-    , doctest    >=0.11.4
-    , filemanip  >=0.3.6.3
+  type: exitcode-stdio-1.0
+  ghc-options:
+    -threaded
+    -O0
 
-  hs-source-dirs:   test
+  main-is: DocSpec.hs
+  build-depends:
+    base,
+    doctest >=0.11.4,
+    filemanip >=0.3.6.3
+
+  hs-source-dirs: test
 
 -- test-suite flat-test
 --   default-language: Haskell2010
 --   type:             exitcode-stdio-1.0
 --   main-is:          FlatTest.hs
-
 --   -- Modules included in this executable, other than Main.
 --   -- other-modules:
-
 --   -- LANGUAGE extensions used by modules in this package.
 --   -- other-extensions:
 --   build-depends:
@@ -148,5 +153,4 @@ test-suite doc
 --     , pretty-simple
 --     , QuickCheck     >=2.14.2
 --     , zm
-
 --   hs-source-dirs:   test
