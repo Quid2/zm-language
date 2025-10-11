@@ -34,6 +34,7 @@ List.Kb8cd13187198 a ≡   Nil
                        | Cons a (List.Kb8cd13187198 a)
 
 prop> \(w::Word8) -> w == w
+Add QuickCheck to your cabal dependencies to run this test.
 
 -}
 generate :: Bool -> AbsEnv -> T.Text

@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
 
 module ZM.To.Util where
@@ -10,11 +11,19 @@ import Control.Monad
 import Control.Monad.Reader
 import Control.Monad.Writer
 import Data.Bifunctor
+import Data.ByteString (ByteString)
 import Data.Char
+import Data.Foldable
+import Data.Int
 import qualified Data.Map as M
 import Data.Maybe
+import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import Data.Word
+import Network.Top.Repo
+import Network.Top.Run
+import Numeric.Natural
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath
 import Text.PrettyPrint (Doc, render, vcat)
@@ -203,3 +212,54 @@ mpar s
   | otherwise = s
 
 snoc xs x = xs ++ [x]
+
+newtype FlatTest a = FlatTest [a]
+
+{-
+>>> flatTests
+[(TypeCon (AbsRef (SHAKE128_48 48 111 25 129 180 28)),"\SOH"),(TypeCon (AbsRef (SHAKE128_48 48 111 25 129 180 28)),"\129"),(TypeApp (TypeCon (AbsRef (SHAKE128_48 218 104 54 119 143 212))) (TypeCon (AbsRef (SHAKE128_48 48 111 25 129 180 28))),"\SOH"),(TypeApp (TypeCon (AbsRef (SHAKE128_48 218 104 54 119 143 212))) (TypeCon (AbsRef (SHAKE128_48 48 111 25 129 180 28))),"\129"),(TypeApp (TypeApp (TypeCon (AbsRef (SHAKE128_48 98 96 228 101 174 116))) (TypeCon (AbsRef (SHAKE128_48 48 111 25 129 180 28)))) (TypeCon (AbsRef (SHAKE128_48 48 111 25 129 180 28))),"\SOH"),(TypeApp (TypeApp (TypeCon (AbsRef (SHAKE128_48 98 96 228 101 174 116))) (TypeCon (AbsRef (SHAKE128_48 48 111 25 129 180 28)))) (TypeCon (AbsRef (SHAKE128_48 48 111 25 129 180 28))),"\193")]
+-}
+flatTests :: (AbsEnv, [(AbsType, ByteString)])
+flatTests =
+  fold
+    [ mkTests [False, True],
+      mkTests [Nothing, Just False],
+      mkTests [Left False, Right True],
+      mkTests [[Left False, Right True], [Right False, Left True]],
+      mkTests [(False, 3333 :: Word16)],
+      mkTests [(False, 'a', True), (True, 'b', False)],
+      mkTests [(False, 3333 :: Word16, True, 'a')],
+      mkTests [(False, 3333 :: Word16, True, 'a', "hello" :: String)],
+      mkTests [(False, 3333 :: Word16, True, 'a', "hello" :: String, 123456 :: Word)],
+      mkTests [(False, 3333 :: Word16, True, 'a', "hello" :: String, False, 123456 :: Word)],
+      mkTests (minMax :: [Word8]),
+      mkTests (minMax :: [Word16]),
+      mkTests (minMax :: [Word32]),
+      mkTests (minMax :: [Word64]),
+      mkTests (minMax :: [Word]),
+      mkTests (minMax :: [Int8]),
+      mkTests (minMax :: [Int16]),
+      mkTests (minMax :: [Int32]),
+      mkTests (minMax :: [Int64]),
+      mkTests (minMax :: [Int]),
+      mkTests [0 :: Integer, 123456789012345678901234567890123456789012345678901234567890, -123456789012345678901234567890123456789012345678901234567890],
+      mkTests [0 :: Natural, 123456789012345678901234567890123456789012345678901234567890],
+      mkTests ["" :: String, "a$€语"],
+      mkTests ["" :: Text, "a$€语"],
+      mkTests [[], [1 .. 11 :: Int]],
+      mkTests "a$€语",
+      mkTests "𐐷",
+      mkTests [12.123 :: Float, -57.238E-11],
+      mkTests [12.123 :: Double, -57.238E-11],
+      mkTests [()]
+    ]
+
+-- data Unit = Unit deriving (Model, Flat)
+
+minMax :: (Bounded a, Num a) => [a]
+minMax = [1, minBound, maxBound]
+
+mkTests :: forall a. (Flat a, Model a) => [a] -> (AbsEnv, [(AbsType, ByteString)])
+mkTests as =
+  let model = absTypeModel (Proxy :: Proxy a)
+   in (typeEnv model, map (\v -> (typeName model, flat v)) as)

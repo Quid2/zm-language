@@ -55,11 +55,11 @@ $setup
 
 A simple ADT
 >>> gen (Proxy :: Proxy Bool)
-[Module {mdlExtension = "ts", mdlPath = ["ADT","Bool","K306f1981b41c"], mdlContent = "/** ZM Type:\nBool \8801   False\n       | True\n*/\n\nimport * as Q from '../.././lib/core'\n\nexport const $Bool:Q.zmFold<Bool> = function (f) {return f(___,[])}\n\nexport const ___ : Q.zmTypeInfo = {\n  zid : [0x30,0x6f,0x19,0x81,0xb4,0x1c],\n  decoder : function (decoders) {\n        return function(st) { if (st.zero()) { return new False() } else { return new True() } }\n  }\n}\n\n\nexport type Bool  = False  | True \n\nexport class False  implements Q.ZM {\n\n  toString():string {return this.toStr(false)}\n  toStr(nested=false):string {return \"False\"}\n  pretty(nested=false):string {return \"False\"}\n\n  match <R>(m:{False:R,True:R}) : R {return m.False;}\n  flatMaxSize():number {return 1+0;}\n  flatEncode(st:Q.EncoderState) {st.zero();}\n\n}\n\nexport class True  implements Q.ZM {\n\n  toString():string {return this.toStr(false)}\n  toStr(nested=false):string {return \"True\"}\n  pretty(nested=false):string {return \"True\"}\n\n  match <R>(m:{False:R,True:R}) : R {return m.True;}\n  flatMaxSize():number {return 1+0;}\n  flatEncode(st:Q.EncoderState) {st.one();}\n\n}\n\n\n"}]
+[Module {mdlExtension = "ts", mdlPath = ["ADT","Bool","K306f1981b41c"], mdlContent = "/** ZM Type:\nBool \8801   False\n       | True\n*/\n\nimport * as Q from '@quid2/core'\n\nexport const $Bool:Q.zmFold<Bool> = function (f) {return f(___,[])}\n\nexport const ___ : Q.zmTypeInfo = {\n  zid : [0x30,0x6f,0x19,0x81,0xb4,0x1c],\n  decoder : function (decoders) {\n        return function(st) { if (st.zero()) { return new False() } else { return new True() } }\n  }\n}\n\n\nexport type Bool  = False  | True \n\nexport class False  implements Q.ZM {\n\n  toString():string {return this.toStr(false)}\n  toStr(nested=false):string {return \"False\"}\n  pretty(nested=false):string {return \"False\"}\n\n  match <R>(m:{False:R,True:R}) : R {return m.False;}\n  flatMaxSize():number {return 1+0;}\n  flatEncode(st:Q.EncoderState) {st.zero();}\n\n}\n\nexport class True  implements Q.ZM {\n\n  toString():string {return this.toStr(false)}\n  toStr(nested=false):string {return \"True\"}\n  pretty(nested=false):string {return \"True\"}\n\n  match <R>(m:{False:R,True:R}) : R {return m.True;}\n  flatMaxSize():number {return 1+0;}\n  flatEncode(st:Q.EncoderState) {st.one();}\n\n}\n\n\n"}]
+
 
 A primitive type
 >>> gen (Proxy :: Proxy Word8)
-[Module {mdlExtension = "ts", mdlPath = ["ADT","Word8","Kb1f46a49c8f8"], mdlContent = "/** ZM Type:\nWord8 \8801   V0\n        | V1\n        | V2\n        | V3\n...
 
 -- x = prettyShow $ flat $ absType p4
 
