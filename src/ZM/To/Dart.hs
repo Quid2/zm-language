@@ -28,9 +28,7 @@ import Data.ByteString (ByteString)
 import qualified Data.Map as M
 import Data.Text (Text)
 import qualified Data.Text as T
-import System.Posix.Internals (get_saved_termios)
 import ZM
-import ZM.Parser (mdl)
 import ZM.To.Util
 
 -- import           FileEmbed
@@ -134,6 +132,7 @@ defaultPrimitiveTypes =
       ("Int.K102a3bb904e3", ValueType "int"),
       ("Char.K066db52af145", ValueType "String"),
       ("String.K2f006595638c", ValueType "String"),
+      ("UTF8Text.K5e220776fb85", ValueType "String"),
       ("Array.K2e8b4519aeaa", ValueType "List<A>"),
       ("Bytes.Kf8844385a443", ValueType "zm.Uint8List"),
       ("Filler.Kae1dfeece189", ValueType "Null"),
