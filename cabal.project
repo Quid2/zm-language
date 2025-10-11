@@ -1,7 +1,7 @@
 
 packages: . 
 
-<source-repository-package
+source-repository-package
     type: git
     location: https://github.com/Quid2/model
     tag: c7de393
